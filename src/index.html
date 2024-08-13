@@ -26,39 +26,58 @@
         <h1>Feedback+</h1>
         <form id="checkForm">
           <fieldset>
-            <textarea
+            <input
               name="feedback"
               id="feedback"
               placeholder="Berikan umpan balik untuk menjadi lebih baik"
               required="required"
-            ></textarea>
+              type="text"
+            />
           </fieldset>
 
           <button type="submit" id="submit">Kirim</button>
         </form>
-        <article class="pico-background-zinc-50">
+        <article id="sentiment" class="pico-background-zinc-50">
           Sentiment for feedback.
         </article>
       </main>
       <script>
         console.log("Client side rocks!");
+        feedback.focus();
         checkForm.addEventListener("submit", async (e) => {
           e.preventDefault();
           const formData = new FormData(checkForm);
           const feedback = formData.get("feedback");
           submit.disabled = true;
           console.log(feedback);
-          const response = await fetch("/api/feedback", {
+          const res = await fetch("/api/feedback", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ feedback }),
           });
-          const data = await response.json();
-          console.log(data);
+          const { response } = await res.json();
+          console.log(response);
+          renderSentiment(response);
           submit.disabled = false;
+          checkForm.reset();
         });
+
+        function renderSentiment(response) {
+          let backgroundColor = "pico-background-zinc-50";
+          switch (response.toLowerCase()) {
+            case "positive":
+              backgroundColor = "pico-background-cyan-100";
+              break;
+            case "negative":
+              backgroundColor = "pico-background-red-150";
+              break;
+          }
+
+          sentiment.className = backgroundColor;
+          sentiment.textContent = response;
+        }
       </script>
     </body>
   </body>
