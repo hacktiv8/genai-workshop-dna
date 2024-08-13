@@ -28,7 +28,6 @@ export async function generate(text: string) {
     });
 
     const res = await fetch(url, { method, headers, body });
-    console.log(res);
     const { response } = await res.json();
     console.log({ response });
     return response?.trim();
