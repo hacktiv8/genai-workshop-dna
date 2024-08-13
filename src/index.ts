@@ -11,6 +11,12 @@ app.get("/", (c) => {
   return c.html(fs.readFileSync("src/index.html", "utf8"));
 });
 
+app.post("/api/feedback", (c) => {
+  const feedback = c.json();
+  console.log(feedback);
+  return c.json({ message: "Feedback received" });
+});
+
 const port = 3000;
 console.log(`Server is running on port ${port}`);
 

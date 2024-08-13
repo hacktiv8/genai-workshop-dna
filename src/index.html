@@ -24,20 +24,42 @@
     <body>
       <main class="container">
         <h1>Feedback+</h1>
-        <form>
+        <form id="checkForm">
           <fieldset>
             <textarea
               name="feedback"
+              id="feedback"
               placeholder="Berikan umpan balik untuk menjadi lebih baik"
+              required="required"
             ></textarea>
           </fieldset>
 
-          <input type="submit" value="Kirim" />
+          <button type="submit" id="submit">Kirim</button>
         </form>
         <article class="pico-background-zinc-50">
           Sentiment for feedback.
         </article>
       </main>
+      <script>
+        console.log("Client side rocks!");
+        checkForm.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const formData = new FormData(checkForm);
+          const feedback = formData.get("feedback");
+          submit.disabled = true;
+          console.log(feedback);
+          const response = await fetch("/api/feedback", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ feedback }),
+          });
+          const data = await response.json();
+          console.log(data);
+          submit.disabled = false;
+        });
+      </script>
     </body>
   </body>
 </html>
