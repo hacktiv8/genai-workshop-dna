@@ -3,8 +3,6 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import fs from "node:fs";
 
-import { generate } from "./llm.js";
-
 const app = new Hono();
 
 app.use("/static/*", serveStatic({ root: "/" }));
@@ -15,7 +13,7 @@ app.get("/", (c) => {
 
 app.post("/api/feedback", async (c) => {
   const { feedback } = await c.req.json();
-  const response = await generate(feedback);
+  const response = "Sentiment analysis result will be displayed here...";
   console.log({ feedback, response });
   return c.json({ feedback, response });
 });
