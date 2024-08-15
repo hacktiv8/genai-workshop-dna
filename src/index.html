@@ -23,8 +23,9 @@
     <![endif]-->
     <body>
       <main class="container">
-        <h1>Feedback+</h1>
+        <h1>Feedback+ | <span id="eventSpan"></span></h1>
         <form id="checkForm">
+          <input type="hidden" value="" id="eventName" />
           <fieldset>
             <input
               name="feedback"
@@ -43,13 +44,16 @@
       </main>
       <script>
         console.log("Client side rocks!");
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        eventSpan.textContent = params.get("event") || "";
+        eventName.value = params.get("event") || "default";
         feedback.focus();
         checkForm.addEventListener("submit", async (e) => {
           e.preventDefault();
           const formData = new FormData(checkForm);
           const feedback = formData.get("feedback");
           submit.disabled = true;
-          console.log(feedback);
           const res = await fetch("/api/feedback", {
             method: "POST",
             headers: {
@@ -62,6 +66,12 @@
           renderSentiment(response);
           submit.disabled = false;
           checkForm.reset();
+          console.log({ feedback, eventName: eventName.value, response });
+          await saveFeedback({
+            feedback,
+            eventName: eventName.value,
+            response,
+          });
         });
 
         function renderSentiment(response) {
@@ -77,6 +87,15 @@
 
           sentiment.className = backgroundColor;
           sentiment.textContent = response;
+        }
+        async function saveFeedback({ feedback, eventName, response }) {
+          const res = await fetch("/api/feedback/save", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ feedback, eventName, response }),
+          });
         }
       </script>
     </body>

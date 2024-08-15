@@ -3,7 +3,8 @@ import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import fs from "node:fs";
 
-import { generate } from "./llm.js";
+import { generate } from "./llm.ts";
+import { turso } from "./db.ts";
 
 const app = new Hono();
 
@@ -18,6 +19,19 @@ app.post("/api/feedback", async (c) => {
   const response = await generate(feedback);
   console.log({ feedback, response });
   return c.json({ feedback, response });
+});
+
+app.post("/api/feedback/save", async (c) => {
+  console.log("save feedback");
+
+  const { feedback, eventName, response } = await c.req.json();
+
+  await turso.execute({
+    sql: "INSERT INTO feedback (event_name, feedback, response) VALUES (?, ?, ?)",
+    args: [eventName, feedback, response],
+  });
+
+  return c.json({ status: "saved", feedback, eventName, response });
 });
 
 const port = 3000;
